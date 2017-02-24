@@ -1,59 +1,47 @@
-<?php
+<?php declare(strict_types=1);
 namespace Gm\Mapper;
 
-use Aws\DynamoDb\DynamoDbClient;
-use Aws\DynamoDb\Exception\DynamoDbException;
-use Aws\DynamoDb\Marshaler;
+use Monolog\Logger;
 use Gm\Mapper\Exception\ProfileNotFoundException;
+use PDO;
 
 class ProfileMapper
 {
     /**
-     * @var DynamoDbClient
+     * @var PDO
      */
-    protected $dynamoDbClient;
+    protected $pdo;
 
     /**
-     * @var Marshaler
+     * @var Logger
      */
-    protected $marshaler;
+    protected $logger;
 
-    public function __construct(DynamoDbClient $dynamoDbClient)
+    public function __construct(PDO $pdo)
     {
-        $this->dynamoDbClient = $dynamoDbClient;
+        $this->pdo = $pdo;
     }
 
-    public function fetchProfileById(int $id)
+    public function fetchProfileById(int $profileId)
     {
-        $marshaler = $this->getMarshaler();
-
-        $params = [
-            'TableName' => 'dd_profiles',
-            'Key' => $marshaler->marshalItem([
-                'id' => $id
-            ])
-        ];
-
-        try {
-            $result = $this->dynamoDbClient->getItem($params);
-        } catch (DynamoDbException $e) {
-            throw $e;
-        };
-
-        if (!isset($result['Item'])) {
-            throw new ProfileNotFoundException(sprintf(
-                'Profile with id %s not found',
-                $id
-            ));
-        }
-        return $marshaler->unmarshalItem($result['Item']);
+        $sql = 'SELECT * FROM `profiles` WHERE profile_id = :profile_id';
+        $statement = $this->pdo->prepare($sql);
+        $statement->bindValue(
+            ':profile_id',
+            $profileId,
+            PDO::PARAM_INT
+        );
+        $statement->execute();
+        $this->logger->debug(sprintf(
+            'SQL Query executed %s',
+            $sql
+        ));
+        return $statement->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    private function getMarshaler()
+    public function setLogger(Logger $logger) : ProfileMapper
     {
-        if (null === $this->marshaler) {
-            return new Marshaler();
-        }
-        return $this->marshaler;
+        $this->logger = $logger;
+        return $this;
     }
 }

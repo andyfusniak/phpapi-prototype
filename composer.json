@@ -6,6 +6,6 @@
     },
     "require": {
         "slim/slim": "^3.7",
-        "aws/aws-sdk-php": "^3.21"
+        "monolog/monolog": "*"
     }
 }
