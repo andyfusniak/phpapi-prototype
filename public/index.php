@@ -14,10 +14,11 @@ use Gm\Mapper\Exception\ProfileNotFoundException;
 $config = require_once('config/config.php');
 
 $container = new Container($config['slim'] ?? null);
-$container['logger'] = function($container) {
+$container['logger'] = function($container) use ($config) {
     $logger = new Logger(
         $config['logger']['logger_name'] ?? 'phpapi'
     );
+
     $logger->pushHandler(
         new StreamHandler(
             $config['logger']['log_filepath'] ?? 'var/log',

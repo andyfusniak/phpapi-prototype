@@ -9,7 +9,7 @@ return [
     ],
     'logger' => [
         'logger_name' => 'phpapi',
-        'log_filepath' => 'var/log',
+        'log_filepath' => dirname(__DIR__) . '/var/log/phpapi.log',
         'log_level' => Logger::DEBUG
     ],
     'db' => [
