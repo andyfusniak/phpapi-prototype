@@ -1,5 +1,5 @@
 <?php
-namespace Gm\Mapper\Exception;
+namespace GreycatMedia\Mapper\Exception;
 
 class ProfileNotFoundException extends \DomainException implements ExceptionInterface
 {

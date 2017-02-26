@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
-namespace Gm\Mapper;
+namespace GreycatMedia\Mapper;
 
 use Monolog\Logger;
-use Gm\Mapper\Exception\ProfileNotFoundException;
+use GreycatMedia\Mapper\Exception\ProfileNotFoundException;
 use PDO;
 
 class ProfileMapper
