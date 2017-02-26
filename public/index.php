@@ -94,7 +94,9 @@ $app->get(
             );
         }
 
-        return $response->withStatus(200)->write(
+        return $response->withStatus(200)
+                        ->withHeader('Access-Control-Allow-Origin', '*')
+                        ->write(
             json_encode($item, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
         );
     }
