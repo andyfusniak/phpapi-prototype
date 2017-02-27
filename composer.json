@@ -1,7 +1,7 @@
 {
     "autoload": {
         "psr-4": {
-            "Gm\\": "src/Gm/"
+            "GreycatMedia\\": "src/GreycatMedia/"
         }
     },
     "require": {

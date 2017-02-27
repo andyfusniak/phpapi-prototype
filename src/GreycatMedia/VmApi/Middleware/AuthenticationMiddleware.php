@@ -1,5 +1,5 @@
 <?php declare(strict_types=1);
-namespace GreycatMedia\Middleware;
+namespace GreycatMedia\VmApi\Middleware;
 
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
@@ -17,9 +17,11 @@ class AuthenticationMiddleware
      */
     public function __invoke(Request $request, Response $response, $next) : Response
     {
-        $response->getBody()->write('BEFORE');
-        $response = $next($request, $response);
-        $response->getBody()->write('AFTER');
-        return $response;
+        var_dump($request);
+        if (true) {
+            return $next($request, $response);
+        }
+        
+        return $response->withStatus(403)->write('Unauthorized');
     }
 }

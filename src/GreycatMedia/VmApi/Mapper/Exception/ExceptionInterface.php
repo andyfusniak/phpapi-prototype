@@ -1,5 +1,5 @@
 <?php
-namespace GreycatMedia\Mapper\Exception;
+namespace GreycatMedia\VmApi\Mapper\Exception;
 
 interface ExceptionInterface
 {
