@@ -1,5 +1,5 @@
 <?php declare(strict_types=1);
-namespace GreycatMedia\VmApi;
+namespace GreycatMedia\Api;
 
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
@@ -7,9 +7,10 @@ use Slim\App;
 use Slim\Container;
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
-use GreycatMedia\VmApi\Mapper\ProfileMapper;
-use GreycatMedia\VmApi\Mapper\Exception\ProfileNotFoundException;
-use GreycatMedia\VmApi\Middleware\AuthenticationMiddleware;
+use GreycatMedia\Api\Mapper\ProfileMapper;
+use GreycatMedia\Api\Mapper\Exception\ProfileNotFoundException;
+use GreycatMedia\Api\Middleware\AuthenticationMiddleware;
+use GreycatMedia\Api\Crypto\SignatureSigner;
 
 class Api
 {
@@ -102,6 +103,20 @@ class Api
                 $container->get('logger')
             );
         };
+        
+        $container['signatureSigner'] = function ($container) {
+            return new SignatureSigner(
+                $container->get('logger')
+            );
+        };
+
+        $container['authenticationMiddleware'] = function ($container) {
+            return new AuthenticationMiddleware(
+                $container->get('signatureSigner'),
+                $container->get('logger')
+            );
+        };
+
         $this->container = $container;
     }
 
@@ -110,7 +125,7 @@ class Api
         $this->app = new App($this->container);
 
         // hmac authentication
-        $this->app->add(new AuthenticationMiddleware());
+        $this->app->add($this->container->get('authenticationMiddleware'));
     }
 
     private function setupRoutes()
@@ -136,7 +151,9 @@ class Api
                     );
                 }
 
-                return $response->withStatus(200)->write(
+                return $response->withStatus(200)
+                                ->withHeader('Content-type', 'application/json')
+                                ->write(
                     json_encode($item, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
                 );
             }
